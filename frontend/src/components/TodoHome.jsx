@@ -1,99 +1,71 @@
-import React from 'react'
+import React, { useEffect, useState } from "react"
+import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
- import CardActions from '@mui/material/CardActions';
- import CardContent from '@mui/material/CardContent';
- import CardMedia from '@mui/material/CardMedia';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
- import { Container, Grid, Stack } from '@mui/material';
- import  {useNavigate} from 'react-router-dom';
-const TodoHome = () => {
-  const [inputs ,setInputs] = useState([])
- const navigate = useNavigate()
-  function updatetodo(todo){
-    navigate('/add',{state:{todo}})
-     }
-       let deletetodo =(p)=>{
-            axios.delete('http://localhost:4000/todo/delete/'+p).then((res)=>{
-              window.location.reload()
-             }
-         //navigate /path
-            ).catch((error)=>{
-           console.log(error)
-           })
-          }
-           useEffect(() => {
-             axios.get('http://localhost:4000/todo/')
-                 .then((res) => {
-                     setInputs(res.data); 
-             })
-                .catch((error) => {
-                    console.error("Error fetching data: ", error);
-                });
-        }, []);
-  return (
-    <>     
+import axios from 'axios'
+import { Link, useNavigate } from "react-router-dom";
 
-<Container>
-         <Grid container spacing={8}>    
-               {inputs.map((input) => (
-                   <Grid item key={input._id} xs={12} sm={6} md={4}>
-                       <Card>
-                          
-                       <CardContent>
-                         
-                              
-                                <Typography variant="h6" component="div">
-                                    {input.Description}
-                               </Typography>
-                               <Typography variant="h6" component="div">
-                                    {input.Status}
-                                </Typography>
-                               
-                              
+function TodoHome() {
+    const [inputs , setInputs] = useState([]);
+    const navigate = useNavigate();
+    const addTodo = () =>{
+        navigate('/add')
+    }
 
-                                <Stack direction="row" spacing={4}>
-                               <Button  variant="contained" color="success" onClick={()=>{updatetodo(input)}} >Add</Button>
+    const deleteTodo =(id) =>{
+        const newArray = axios.delete(`http://localhost:4000/todo/delete/${id}`)
+  setInputs(newArray);
+  };
+    
+    
 
-                               <Button  variant="contained" color="error" onClick={()=>{deletetodo(input._id)}} >Delete</Button>
+    
+   
+    const fetchProducts = async () => {
+            const { data } = await axios.get("http://localhost:4000/todo/");
+            const inputs = data;
+            setInputs(inputs);
+            console.log(inputs);
+          };
+          useEffect(() => {
+              fetchProducts();
+              
+             }, []);
+  
+    return (
+      
+       <>
+ {inputs.map((input) => (<>
+<Card sx={{ minWidth: 275 }}  key = {input._id}>
+ 
+      <CardContent>
+    
+        <Typography variant="body2">
+          {input.Description}
+          <br />
+          
+        </Typography>
+        <Typography>{input.Status}</Typography>
+      </CardContent>
+      <CardActions>
+        
+        <Button onClick={()=>{addTodo()}} >add</Button>
+        <Button onClick={()=>{deleteTodo(input._id)}} >delete</Button>
+      </CardActions>
+    
+    </Card>
+    <br />
+    </>
+    
+    ))}
+       
+    </>
+      
+    )
+  }
+  
+  export default  TodoHome
 
-                                 </Stack>
-                           </CardContent>
-                        </Card>
-                    </Grid>
-               ))}
-           </Grid>
-         </Container>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-     </>
-  )
-}
-
-export default TodoHome
